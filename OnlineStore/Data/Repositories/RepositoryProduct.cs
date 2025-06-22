@@ -9,7 +9,7 @@ namespace OnlineStore.Data.Repositories;
 public class RepositoryProduct(OnlineStoreDBContext context) : IRepositoryProduct
 {
     /// <summary>
-    /// Получение диталей продукта по его id с помощью Entity Framework
+    /// Получение деталей продукта по его id с помощью Entity Framework
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>

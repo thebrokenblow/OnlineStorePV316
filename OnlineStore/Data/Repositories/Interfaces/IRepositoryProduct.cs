@@ -6,7 +6,7 @@ namespace OnlineStore.Data.Repositories.Interfaces;
 public interface IRepositoryProduct
 {
     /// <summary>
-    /// Получение диталей продукта по его id
+    /// Получение деталей продукта по его id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
