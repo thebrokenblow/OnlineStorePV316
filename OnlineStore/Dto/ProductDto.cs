@@ -1,13 +1,9 @@
-﻿namespace OnlineStore.Model;
+﻿namespace OnlineStore.Dto;
 
-public class Product
+public class ProductDto
 {
-    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required decimal Price { get; set; }
-
-
     public required int ProductCategoryId { get; set; }
-    public ProductCategory? ProductCategory { get; set; }
 }

@@ -1,8 +1,7 @@
-﻿namespace OnlineStore.Test;
+﻿namespace OnlineStore.Test.Dto;
 
-public class ProductCategory
+public class ProductCategoryDto
 {
-    public int Id { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
 }

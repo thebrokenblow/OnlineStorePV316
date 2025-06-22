@@ -6,7 +6,7 @@ using OnlineStore.Model;
 namespace OnlineStore.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/categories")]
 public class ProductCategoryController(IRepositoryProductCategory repository) : Controller
 {
     [HttpGet]
