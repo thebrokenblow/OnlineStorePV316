@@ -1,7 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OnlineStore.Data.Repositories.Interfaces;
-using OnlineStore.Exceptions;
-using OnlineStore.Model;
+using OnlineStore.Application.ProductCategories.Commands.ProductCategoryCreate;
+using OnlineStore.Application.ProductCategories.Commands.ProductCategoryDelete;
+using OnlineStore.Application.ProductCategories.Commands.ProductCategoryUpdate;
+using OnlineStore.Application.ProductCategories.Queries.GetAllProductCategories;
+using OnlineStore.Application.ProductCategories.Queries.GetDetailsProductCategory;
+using OnlineStore.Application.ProductCategories.Queries.GetRangeProductsCategories;
+using OnlineStore.Application.RepositoryInterfaces;
+using OnlineStore.Domain;
+using OnlineStore.Storage.Exceptions;
 
 namespace OnlineStore.Controllers;
 
@@ -10,9 +16,9 @@ namespace OnlineStore.Controllers;
 public class ProductCategoryController(IRepositoryProductCategory repository) : Controller
 {
     [HttpGet]
-    public async Task<ActionResult> GetAllAsync()
+    public async Task<ActionResult> GetAllAsync([FromServices] GetAllProductCategoriesHandler getAllProductCategoriesHandler)
     {
-        var productCategories = await repository.GetAllAsync();
+        var productCategories = await getAllProductCategoriesHandler.Execute();
 
         return Ok(productCategories);
     }
@@ -20,7 +26,8 @@ public class ProductCategoryController(IRepositoryProductCategory repository) : 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetByIdAsync(int id)
     {
-        var productCategory = await repository.GetByIdAsync(id);
+        var getDetailsProductCategoryHandler = new GetDetailsProductCategoryHandler(repository);
+        var productCategory = await getDetailsProductCategoryHandler.Execute(id);
 
         return Ok(productCategory);
     }
@@ -28,7 +35,8 @@ public class ProductCategoryController(IRepositoryProductCategory repository) : 
     [HttpGet("{skip}/{take}")]
     public async Task<ActionResult> GetRangeAsync(int skip, int take)
     {
-        var productCategories = await repository.GetRangeAsync(skip, take);
+        var getRangeProductCategoriesHandler = new GetRangeProductCategoriesHandler(repository);
+        var productCategories = await getRangeProductCategoriesHandler.Execute(skip, take);
 
         return Ok(productCategories);
     }
@@ -36,7 +44,8 @@ public class ProductCategoryController(IRepositoryProductCategory repository) : 
     [HttpPost]
     public async Task<ActionResult> AddAsync(ProductCategory productCategory)
     {
-        await repository.AddAsync(productCategory);
+        var createProductCategoryHandler = new CreateProductCategoryHandler(repository);
+        await createProductCategoryHandler.Execute(productCategory);
 
         return Created();
     }
@@ -46,7 +55,8 @@ public class ProductCategoryController(IRepositoryProductCategory repository) : 
     {
         try
         {
-            await repository.RemoveAsync(id);
+            var deleteProductCategoryHandler = new DeleteProductCategoryHandler(repository);
+            await deleteProductCategoryHandler.Execute(id);
         }
         catch (NotFoundException)
         {
@@ -61,7 +71,8 @@ public class ProductCategoryController(IRepositoryProductCategory repository) : 
     {
         try
         {
-            await repository.UpdateAsync(productCategory);
+            var updateProductCategoryHandler = new UpdateProductCategoryHandler(repository);
+            await updateProductCategoryHandler.Execute(productCategory);
         }
         catch (NotFoundException)
         {

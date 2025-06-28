@@ -1,18 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-using OnlineStore.Data;
-using OnlineStore.Data.Repositories;
-using OnlineStore.Data.Repositories.Interfaces;
+using OnlineStore.Application.Extensions;
+using OnlineStore.Storage.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-var connectionString = builder.Configuration.GetConnectionString("OnlineStoreConnectionString");
-builder.Services.AddDbContext<OnlineStoreDBContext>(options => options.UseNpgsql(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("OnlineStoreConnectionString") ?? 
+    throw new ArgumentNullException("Не установленна строка подключения");
 
-builder.Services.AddScoped<IRepositoryProductCategory, RepositoryProductCategory>();
-builder.Services.AddScoped<IRepositoryProduct, RepositoryProduct>();
+builder.Services
+        .AddStorageDependency(connectionString)
+        .AddApplicationDependency();
 
 var app = builder.Build();
 

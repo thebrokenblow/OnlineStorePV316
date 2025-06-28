@@ -1,5 +1,5 @@
-﻿using OnlineStore.Dto;
-using OnlineStore.Model;
+﻿using OnlineStore.Domain;
+using OnlineStore.Dto;
 
 namespace OnlineStore.Mappers;
 

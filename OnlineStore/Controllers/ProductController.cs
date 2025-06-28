@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OnlineStore.Data.Repositories.Interfaces;
+using OnlineStore.Application.Products.Commands.ProductCreate;
+using OnlineStore.Application.Products.Commands.ProductDelete;
+using OnlineStore.Application.Products.Commands.ProductUpdate;
+using OnlineStore.Application.Products.Queries.GetAllProducts;
+using OnlineStore.Application.Products.Queries.GetDetailsProduct;
+using OnlineStore.Application.Products.Queries.GetRangeProducts;
+using OnlineStore.Application.RepositoryInterfaces;
 using OnlineStore.Dto;
-using OnlineStore.Exceptions;
 using OnlineStore.Mappers;
-using OnlineStore.Model;
-using OnlineStore.Validations;
+using OnlineStore.Storage.Exceptions;
 
 namespace OnlineStore.Controllers;
 
@@ -15,7 +19,17 @@ public class ProductController(IRepositoryProduct repository) : Controller
     [HttpGet]
     public async Task<ActionResult> GetAllAsync()
     {
-        var products = await repository.GetAllAsync();
+        var getAllProductsHandler = new GetAllProductsHandler(repository);
+        var products = await getAllProductsHandler.Execute();
+
+        return Ok(products);
+    }
+
+    [HttpGet("{skip}/{take}")]
+    public async Task<ActionResult> GetRangeAsync(int skip, int take)
+    {
+        var getRangeProductsHandler = new GetRangeProductsHandler(repository);
+        var products = await getRangeProductsHandler.Execute(skip, take);
 
         return Ok(products);
     }
@@ -23,33 +37,21 @@ public class ProductController(IRepositoryProduct repository) : Controller
     [HttpGet("{id}")]
     public async Task<ActionResult> GetByIdAsync(int id)
     {
-        var productDetailsVM = await repository.GetByIdAsync(id);
+        var getDetailsProductHandler = new GetDetailsProductHandler(repository);
+        var product = await getDetailsProductHandler.Execute(id);
 
-        return Ok(productDetailsVM);
-    }
-
-    [HttpGet("{skip}/{take}")]
-    public async Task<ActionResult> GetRangeAsync(int skip, int take)
-    {
-        var products = await repository.GetRangeAsync(skip, take);
-
-        return Ok(products);
+        return Ok(product);
     }
 
     [HttpPost]
     public async Task<ActionResult> AddAsync(ProductDto productDto)
     {
-        var validateResult = ValidationProductDto.Validate(productDto);
-
-        if (!validateResult.IsValid)
-        {
-            return BadRequest(validateResult);    
-        }
-
         try
         {
             var product = MapperProductDto.Map(productDto);
-            await repository.AddAsync(product);
+
+            var productCreateHandler = new ProductCreateHandler(repository);
+            await productCreateHandler.Execute(product);
         }
         catch (NotFoundException)
         {
@@ -64,7 +66,8 @@ public class ProductController(IRepositoryProduct repository) : Controller
     {
         try
         {
-            await repository.RemoveAsync(id);
+            var productDeleteHandler = new ProductDeleteHandler(repository);
+            await productDeleteHandler.Execute(id);
         }
         catch (NotFoundException)
         {
@@ -75,11 +78,15 @@ public class ProductController(IRepositoryProduct repository) : Controller
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateAsync(Product product)
+    public async Task<ActionResult> UpdateAsync(ProductDto productDto)
     {
         try
         {
-            await repository.UpdateAsync(product);
+            
+            var product = MapperProductDto.Map(productDto);
+
+            var productUpdateHandler = new ProductUpdateHandler(repository);
+            await productUpdateHandler.Execute(product);
         }
         catch (NotFoundException)
         {
