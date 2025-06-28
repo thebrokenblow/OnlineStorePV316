@@ -16,7 +16,17 @@ namespace OnlineStore.Controllers;
 [Route("api/products")]
 public class ProductController(IRepositoryProduct repository) : Controller
 {
+    /// <summary>
+    /// Gets the all products
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    /// GET /api/products
+    /// </remarks>
+    /// <returns>Returns list of allProductDto</returns>
+    /// <response code="200">Success</response>
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> GetAllAsync()
     {
         var getAllProductsHandler = new GetAllProductsHandler(repository);
@@ -44,16 +54,15 @@ public class ProductController(IRepositoryProduct repository) : Controller
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddAsync(ProductDto productDto)
+    public async Task<ActionResult> AddAsync([FromServices] ProductCreateHandler productCreateHandler, ProductDto productDto)
     {
         try
         {
             var product = MapperProductDto.Map(productDto);
 
-            var productCreateHandler = new ProductCreateHandler(repository);
             await productCreateHandler.Execute(product);
         }
-        catch (NotFoundException)
+        catch (Exception)
         {
             throw;
         }
