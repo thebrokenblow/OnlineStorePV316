@@ -5,8 +5,8 @@ namespace OnlineStore.Application.Products.Commands.ProductCreate;
 
 public class ProductCreateValidation : AbstractValidator<Product>
 {
-    private const int MaxNameLength = 2;
-    private const int MaxDescriptionLength = 1024;
+    public const int MaxNameLength = 2;
+    public const int MaxDescriptionLength = 1024;
 
     public ProductCreateValidation()
     {
